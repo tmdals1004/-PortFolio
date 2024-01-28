@@ -1,0 +1,30 @@
+#include <MPU6050_tockn.h>
+#include <Wire.h>
+
+//----- Servo -----//
+#include <Servo.h>
+
+MPU6050 mpu6050(Wire);
+
+void setup() {
+  Serial.begin(9600);
+  Wire.begin();
+  mpu6050.begin();
+  mpu6050.calcGyroOffsets(true);  
+
+  servo.attach(9);(9번핀 사용)
+}
+
+void loop() {
+  mpu6050.update();          
+  Serial.print("angleX : ");
+  Serial.print(mpu6050.getAngleX());   // X축 회전 각도(Pitch)
+  Serial.print("\tangleY : ");
+  Serial.print(mpu6050.getAngleY());   // Y축 회전 각도(Yaw)
+  Serial.print("\tangleZ : ");
+  Serial.println(mpu6050.getAngleZ()); // Z축 회전 각도(Roll)
+
+  int degree = map(mpu6050.getAngleZ(), -90, 90, 0, 180); // MPU6050의 각도 -90~90을 0~180으로 변환
+  int degree_limit = constrain(degree, 0, 180);           // 0~180으로 범위 제한함
+  servo.write(degree_limit);                              // 서보모터 작동
+}
